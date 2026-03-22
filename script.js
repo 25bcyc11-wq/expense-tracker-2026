@@ -196,6 +196,6 @@ function updateChart() {
     }
   });
 }
-
-// 🚀 START APP
-loadExpenses();
+window.onload = () => {
+  loadExpenses();
+};
