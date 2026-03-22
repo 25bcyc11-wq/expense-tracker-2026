@@ -1,0 +1,95 @@
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #f5ebe0;
+  text-align: center;
+  color: #5a3e36;
+}
+
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+}
+
+/* Dashboard */
+.dashboard {
+  display: flex;
+  justify-content: space-around;
+  background: #e3d5ca;
+  padding: 15px;
+  border-radius: 15px;
+  margin: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* Calendar */
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 70px);
+  justify-content: center;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.calendar div {
+  padding: 12px;
+  font-size: 14px;
+  background: #d6ccc2;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  position: relative;
+}
+
+/* Hover */
+.calendar div:hover {
+  background: #cdb4db;
+}
+
+/* Lamp click effect ✨ */
+.calendar div:active {
+  background: #f8edeb;
+  box-shadow: 
+    0 0 20px #ffe5d9,
+    0 0 40px #ffd7ba,
+    0 0 60px #ffcab0;
+  transform: scale(0.95);
+}
+
+/* Selected date */
+.selected {
+  background: #cdb4db !important;
+  color: white;
+}
+
+/* Expense Box */
+.expense-box {
+  background: #e3d5ca;
+  padding: 20px;
+  margin: 20px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+input, select, button {
+  margin: 5px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  background: #d5bdaf;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #cdb4db;
+}
+
+/* Graph */
+canvas {
+  width: 90% !important;
+  max-width: 900px;
+  height: 400px !important;
+  margin: 30px auto;
+}
