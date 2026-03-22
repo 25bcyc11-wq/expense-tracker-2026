@@ -1,22 +1,24 @@
 const SUPABASE_URL = "https://qubzmqiygyrrstacgyyh.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1YnptcWl5Z3lycnN0YWNneXloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNTc0NDksImV4cCI6MjA4OTczMzQ0OX0.cRHhVSNzl42wJ6bMbEIzQMznB9g9Q4GA0nh0xpWEfQQ";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// ✅ FIXED CLIENT
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentDate = new Date();
 let selectedDate = null;
 let expensesList = [];
 
-// 🔥 LOAD DATA FROM SUPABASE
+// 🔥 LOAD DATA
 async function loadExpenses() {
-  const { data, error } = await supabase.from("expenses").select("*");
+  const { data, error } = await supabaseClient.from("expenses").select("*");
 
   if (error) {
-    console.error(error);
+    console.error("ERROR:", error);
+    alert("Database error");
     return;
   }
 
-  expensesList = data;
+  expensesList = data || [];
   renderCalendar();
   updateDashboard();
   updateChart();
@@ -52,6 +54,7 @@ function renderCalendar() {
   }
 }
 
+// ⬅️➡️ NAVIGATION
 function prevMonth() {
   currentDate.setMonth(currentDate.getMonth() - 1);
   renderCalendar();
@@ -90,36 +93,35 @@ function showExpenses() {
 
   const dayExpenses = expensesList.filter(e => e.date === selectedDate);
 
+  if (dayExpenses.length === 0) {
+    list.innerHTML = "<li style='list-style:none;'>No expenses</li>";
+    return;
+  }
+
   dayExpenses.forEach(exp => {
     let li = document.createElement("li");
-    li.style.listStyle = "none";
-    li.style.padding = "5px 0";
-    li.style.borderBottom = "1px solid #d5bdaf";
     li.innerText = `${exp.category} - ${exp.name}: ₹${exp.amount}`;
     list.appendChild(li);
   });
-
-  if (dayExpenses.length === 0) {
-    list.innerHTML = "<li style='list-style:none; color:#888;'>No expenses for this date.</li>";
-  }
 }
 
 // ➕ ADD EXPENSE
 async function addExpense() {
-  if (!selectedDate) return alert("Select a date first!");
+  if (!selectedDate) return alert("Select date first");
 
   let name = document.getElementById("name").value.trim();
   let amount = document.getElementById("amount").value;
   let category = document.getElementById("category").value;
 
-  if (!name || !amount) return alert("Enter details");
+  if (!name || !amount) return alert("Fill all fields");
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("expenses")
     .insert([{ name, amount: Number(amount), category, date: selectedDate }]);
 
   if (error) {
-    alert("Error adding expense");
+    alert("Error saving");
+    console.error(error);
     return;
   }
 
@@ -133,7 +135,7 @@ async function addExpense() {
   updateDashboard();
   updateChart();
 
-  alert("Added ✅");
+  alert("Saved ✅");
 }
 
 // 📊 CALCULATIONS
@@ -163,11 +165,10 @@ function updateDashboard() {
   document.getElementById("currentTotal").innerText = current;
   document.getElementById("prevTotal").innerText = prev;
 
-  let diff = current - prev;
   document.getElementById("comparison").innerText =
-    diff > 0
-      ? `You spent ₹${diff} more`
-      : `You saved ₹${Math.abs(diff)}`;
+    current > prev
+      ? `Spent more`
+      : `Saved`;
 }
 
 // 📈 GRAPH
@@ -183,19 +184,20 @@ function updateChart() {
   if (chart) chart.destroy();
 
   let ctx = document.getElementById("chart");
-  if (!ctx) return;
 
   chart = new Chart(ctx, {
     type: "bar",
     data: {
       labels: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
       datasets: [{
-        label: `Monthly Expenses (${year})`,
+        label: "Expenses",
         data: data
       }]
     }
   });
 }
+
+// 🚀 START
 window.onload = () => {
   loadExpenses();
 };
